@@ -6,7 +6,7 @@ __`Team Members`__: Qais Humeid, Ki Beom Kim, Louis Leclair
 To reproduce our results you must folllow these instructions step by step:
 
 1. Be sure to have `Numpy` installed. This is the only external library we used.
-2. Download the `train.csv` and `test.csv` and put them in the /data folder.
+2. Download the `train.csv` and `test.csv` and put them in the data folder.
 3. Be sure to have all auxiliary modules with the `run.py` file.
 4. Once you download all the files, you need to go to the directory `src` where the script is. 
 5. Run python script - `run.py`
