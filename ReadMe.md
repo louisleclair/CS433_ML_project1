@@ -1,7 +1,7 @@
-# EPFL Machine Learning Higgs 
+# EPFL Machine Learning Project 1: Higgs Boson 
 __`Team`__: arbitrageurs
 
-__`Team Members`__: Qais Humeid, Kim Ki Beom, Louis Leclair
+__`Team Members`__: Qais Humeid, Ki Beom Kim, Louis Leclair
 
 To reproduce our results you must folllow these instructions step by step:
 
@@ -43,14 +43,14 @@ Contain the mandatory implementations of regression models for the project.
 - __`reg_logistic_regression`__: Regularized logistic regression using SGD
 
 ### `run.py` 
-Script that generate the `submission.csv` file containing our predictions.
+A script that generate the `submission.csv` file containing our predictions.
 
 ## Auxiliary modules
 
 ### `proj1_helpers.py`
 Helper file given by the TAs. It contains:
 
-- __`load_csv_data`__: help us to load the data from the csv file with the distinction between the outputs, the inputs and the ids of the data.
+- __`load_csv_data`__: helps us to load the data from the csv file with the distinction between the outputs, the inputs and the ids of the data.
 - __`predict_labels`__: given the training weights and the data give the predictions of our model.
 - __`create_csv_submission`__: create the output file in csv format for the submission.
 
@@ -60,27 +60,27 @@ File where we put all our auxiliary methods which help us during the project. We
 #### `Data Processing Functions`
 We have 2 auxiliary functions and 1 function which create our data in the wanted format.
 
-- __`standardize`__: normalize the data to have a mean equals to 0 and a standard deviation equals to 0.
-- __`remove_NA`__: remove features when the percentage of -999 is greater than a certain threshold.
-- __`build_data`__: Create the data we are going to used in our model.
+- __`standardize`__: normalizes the data to the dataset with a mean 0 and a standard deviation 1.
+- __`remove_NA`__: remove features with the percentage of -999 greater than a certain threshold.
+- __`build_data`__: Create the data which will be used in our model.
 
 #### `Cost and gradient functions`
 Contain 1 auxiliary function, 2 cost functions and 2 gradient functions.
 
-- __`sigmoid`__: auxiliary function to help compute the logistic loss
-- __`compute_mse`__: Compute mean square error.
+- __`sigmoid`__: Compute the logistic loss
+- __`compute_mse`__: Compute the mean square error.
 - __`logistic_loss`__: Compute the loss for logistic regression.
 - __`compute_gradient`__: Compute the gradient of linear regression and return it with the error.
 - __`logistic_gradient`__: Compute the gradient for logistic regression.
 
 #### `Cross Validation functions`
-Helpers functions  __`build_k_indices`__, __`cross_validation`__. Which help us to find the best hyperparameter gamma and lambda and avoid overfitting.
+Helpers functions  __`build_k_indices`__, __`cross_validation`__, which find the best hyperparameter gamma, lambda and avoid overfitting.
 
 #### `Tool functions`
-We have __`batch_iter`__ for the creation of batch, the implementation come from the labs and __`pred_labels`__ which is our implementation to predict the labels.
+We have __`batch_iter`__ for the creation of batch data, the implementation come from the labs and __`pred_labels`__ which is our implementation to predict the labels.
 
 ### `Data File`
-File where we have the __`test.csv`__, __`train.csv`__ and __`sample-submission.csv`__ which is the data we used for the training of our model and the testing.
+File where we have the __`test.csv`__, __`train.csv`__ and __`sample-submission.csv`__, the data used for the training of our model and the testing.
 
 ### `Result File`
 File created at the end of the __`run.py`__ where we put __`submission.csv`__ which is our prediction model.
