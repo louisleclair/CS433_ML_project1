@@ -47,14 +47,14 @@ Script that generate the `submission.csv` file containing our predictions.
 
 ## Auxiliary modules
 
-###`proj1_helpers.py`
+### `proj1_helpers.py`
 Helper file given by the TAs. It contains:
 
 - __`load_csv_data`__: help us to load the data from the csv file with the distinction between the outputs, the inputs and the ids of the data.
 - __`predict_labels`__: given the training weights and the data give the predictions of our model.
 - __`create_csv_submission`__: create the output file in csv format for the submission.
 
-###`helpers.py`
+### `helpers.py`
 File where we put all our auxiliary methods which help us during the project. We have different category inside this file. We have the methods for data processing, for the costs, for the cross validation and some tool functions.
 
 #### `Data Processing Functions`
