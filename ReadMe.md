@@ -31,7 +31,7 @@ To reproduce our results you must folllow these instructions step by step:
 
 ## Mandatory modules
 
-###`Implementations.py`
+### `Implementations.py`
 
 Contain the mandatory implementations of regression models for the project.
 
