@@ -2,71 +2,108 @@ import numpy as np
 import implementations
 from proj1_helpers import *
 
-def batch_iter(y, tx, batch_size=1, num_batches=1, shuffle=True):
-    data_size = len(y)
-    if shuffle: 
-        shuffle_indices = np.random.permutation(np.arange(data_size))
-        shuffled_y = y[shuffle_indices]
-        shuffled_tx = tx[shuffle_indices]
-    else:
-        shuffled_y = y
-        shuffled_tx = tx
-    for batch_num in range(num_batches):
-        start_index = batch_num * batch_size
-        end_index = min((batch_num + 1) * batch_size, data_size)
-        if start_index != end_index:
-            yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
-
-def compute_gradient(y, tx, w):
-    error = y - (tx @ w)
-    gradient = (- 1/y.shape[0]) * tx.T @ (error)
-    return gradient, error
-
-def compute_mse(e):
-    return 1/2 * np.mean(e ** 2)
+# ==============================================
+# Cost and gradient functions
+# ==============================================
 
 def sigmoid(x):
+    '''Return the compute sigmoid of a given x'''
     return 1/(1  + np.exp(-x))
 
+def compute_mse(e):
+    '''Return the mean square error of a given error vector e'''
+    return 1/2 * np.mean(e ** 2)
+
 def logistic_loss(y, tx, w):
+    '''
+    Compute the loss of a logistic regression.
+
+    Parameters:
+        y (Nx1 np.array of labels): known labels.
+        tx (NxM np.array of data): training set of N datas with M features.
+        w (Mx1 np.array of weights): weight vector.
+    
+    Returns: 
+        loss: the opposite of the compute loss of a logistic regression.
+    '''
     sig = sigmoid(tx @ w)
     loss = (y.T @ np.log(sig)) + ((1 - y)).T @ (np.log(1 - sig))
     return -loss
 
+def compute_gradient(y, tx, w):
+    '''
+    Compute the gradient needed for gradient descent.
+
+    Parameters:
+        y (Nx1 np.array of labels): known labels.
+        tx (NxM np.array of data): training set of N datas with M features.
+        w (Mx1 np.array of weights): weight vector.
+    
+    Returns: 
+        grad: gradient for gradient descent.
+        error: vector of error needed to compute the loss.
+    '''
+    error = y - (tx @ w)
+    gradient = (- 1/y.shape[0]) * tx.T @ (error)
+    return gradient, error
+
 def logistic_gradient(y, tx, w):
+    '''
+    Compute the gradient needed for logistic regression.
+
+    Parameters:
+        y (Nx1 np.array of labels): known labels.
+        tx (NxM np.array of data): training set of N datas with M features.
+        w (Mx1 np.array of weights): weight vector.
+    
+    Returns: 
+        grad: gradient for logistic regression.
+    '''
     sig = sigmoid(tx @ w)
     grad = tx.T @ (sig - y)
     return grad
 
-def regression(y, tx, w, gamma):
-    grad = logistic_gradient(y, tx, w)
-    loss = logistic_loss(y, tx, w)
-    w = w - gamma*grad
-    return w, loss
-
-def regularized_regression(y, tx, w, gamma, lambda_):
-    grad = logistic_gradient(y, tx, w) + lambda_ * 2 * w
-    loss = logistic_loss(y, tx, w) + lambda_ * np.linalg.norm(w)
-    w = w - gamma*grad
-    return w, loss  
-
 # ==============================================
-# Data cleaning part
+# Data Pre-processing part 
 # ==============================================
 
 def standardize(x):
+    '''Given a NxM matrix or Nx1 vector, return the standardize data such that the mean is 0 and the stadard deviation 1.'''
     mean_x = np.mean(x, axis=0)
     x = x - mean_x
     std_x = np.std(x, axis=0)
     return x / std_x
 
 def remove_NA(tX, threshold):
-    rows, cols = tX.shape
+    '''
+    Remove the feature in the data set when there is too much missing data.
+
+    Parameters:
+        tX (NxM np.array of data): training set of N datas with M features.
+        threshold: percentage to check if the numbers of missing data is below it.
+
+    Returns:
+        tX: the training set without the features where the missing data where greater than the threshold.
+    '''
+    rows, _ = tX.shape
     bool_arr = (tX == -999)
     percent_missing = np.sum(bool_arr, axis=0)/rows
     return tX[:,(percent_missing <= threshold)]
 
 def build_data(y, tX, threshold):
+    '''
+    Using the jet number in the data, we slice our data in 4 groups, as well as the prediction. 
+    Delete some features, standardize the data and add the biais at the end 
+
+    Parameters:
+        y (Nx1 np.array of labels): known labels.
+        tx (NxM np.array of data): training set of N datas with M features.
+        threshold: percentage to check if the numbers of missing data is below it.
+    
+    Returns:
+        tx0, tx1, tx2, tx3: the standardize training set with the jet number equal to 0,1,2,3 with some removed features depending of the threshold.
+        Y0, Y1, Y2, Y4: the training prediction with the jet number equal to 0,1,2,3.
+    '''
     pri_jet_num = tX[:,22]
     prn0 = (pri_jet_num == 0)
     prn1 = (pri_jet_num == 1)
@@ -132,7 +169,7 @@ def build_k_indices(y, k_fold, seed):
 
 
 def cross_validation(y, x, initial_w, max_iters, gamma, lambda_, k_indices, k):
-    """return the loss of ridge regression."""
+    '''Given the train data, prediction and an initial w, we used this function to help us find the best hyperparameters'''
     # get k'th subgroup in test, others in train
     te_indice = k_indices[k]
     tr_indice = k_indices[~(np.arange(k_indices.shape[0]) == k)]
@@ -141,18 +178,27 @@ def cross_validation(y, x, initial_w, max_iters, gamma, lambda_, k_indices, k):
     y_tr = y[tr_indice]
     x_te = x[te_indice]
     x_tr = x[tr_indice]
-    # ridge regression
     w_final, _ = implementations.reg_logistic_regression(y_tr, x_tr, initial_w, max_iters, gamma, lambda_)
-    # calculate the loss for train and test data
+    # calculate the prediction for train and test data
     pred_tr = np.count_nonzero((y_tr == predict_labels(w_final, x_tr)) == 1)/len(y_tr)
     pred_te = np.count_nonzero((y_te == predict_labels(w_final, x_te)) == 1)/len(y_te)
     return pred_tr, pred_te
 
 # ==============================================
-# Cross Validation
+# Tool functions
 # ==============================================
 
 def pred_labels(all_tx_te, all_id_te, weights):
+    '''
+    Knowing our data is split in 4 different groups depending of the jet number, we have to reconstruct the prediction labels to have the good format for the submission.
+
+    Parameters:
+        all_tx_te: Array of size 4 containing the test data slice depending of the jet number.
+        all_id_te: Array of size 4 containing the id of the test data depending of the jet number.
+        weights: Array of size 4 containing the weight vector for each test set with the size of the vector depending of the number of features.
+    Returns: 
+        result: our prediction labels.
+    '''
     pred_res = np.array([], dtype=int)
     all_ids = np.array([], dtype=int)
 
@@ -169,3 +215,19 @@ def pred_labels(all_tx_te, all_id_te, weights):
     result = np.zeros(len(all_ids))
     result[all_ids] = pred_res
     return result
+
+def batch_iter(y, tx, batch_size=1, num_batches=1, shuffle=True):
+    '''Function taken from the labs, which yield batch of train data and prediction with a default size of 1 and a default number of 1'''
+    data_size = len(y)
+    if shuffle: 
+        shuffle_indices = np.random.permutation(np.arange(data_size))
+        shuffled_y = y[shuffle_indices]
+        shuffled_tx = tx[shuffle_indices]
+    else:
+        shuffled_y = y
+        shuffled_tx = tx
+    for batch_num in range(num_batches):
+        start_index = batch_num * batch_size
+        end_index = min((batch_num + 1) * batch_size, data_size)
+        if start_index != end_index:
+            yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
